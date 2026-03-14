@@ -1,13 +1,23 @@
-# Drupal Email Tracker
+# Email Tracker
 
-Email Tracker is a Drupal module that records email engagement.
+Email Tracker is a Drupal module that records email activity such as opens and link clicks.
 
-Features:
+## Features
+
 - Email open tracking
 - Link click tracking
 - Email logging
 
-Compatible with:
-Drupal 9
-Drupal 10
-Drupal 11
+## Requirements
+
+- Drupal 9 / 10 / 11
+
+## Installation
+
+1. Download the module
+2. Place it in /modules/custom or /modules/contrib
+3. Enable via Drupal admin or Drush
+
+## Maintainer
+
+Narendra Singh
