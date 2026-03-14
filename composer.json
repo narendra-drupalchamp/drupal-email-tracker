@@ -1,0 +1,10 @@
+{
+  "name": "narendra/email_tracker",
+  "type": "drupal-module",
+  "description": "Tracks email opens and clicks.",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=7.3",
+    "drupal/core": "^9 || ^10 || ^11"
+  }
+}
