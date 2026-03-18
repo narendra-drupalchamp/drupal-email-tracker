@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Email Tracker module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function email_tracker_schema() {
+  $schema = [];
+
+  /**
+   * Main email table.
+   */
+  $schema['email_tracker_mail'] = [
+    'description' => 'Stores sent emails.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'uuid' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ],
+      'recipient' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'subject' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'sent',
+      ],
+      'opens' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'clicks' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'uuid_unique' => ['uuid'],
+    ],
+    'indexes' => [
+      'recipient' => ['recipient'],
+      'created' => ['created'],
+      'status' => ['status'],
+    ],
+  ];
+
+  /**
+   * Event tracking table.
+   */
+  $schema['email_tracker_event'] = [
+    'description' => 'Stores email events like opens and clicks.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'mail_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'event_type' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ],
+      'event_time' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'ip' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => FALSE,
+      ],
+      'user_agent' => [
+        'type' => 'text',
+        'not null' => FALSE,
+      ],
+      'url' => [
+        'type' => 'text',
+        'not null' => FALSE,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'mail_id' => ['mail_id'],
+      'event_type' => ['event_type'],
+      'mail_event' => ['mail_id', 'event_type'],
+    ],
+    'foreign keys' => [
+      'mail_id_fk' => [
+        'table' => 'email_tracker_mail',
+        'columns' => ['mail_id' => 'id'],
+      ],
+    ],
+  ];
+
+  return $schema;
+}
