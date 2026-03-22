@@ -1,0 +1,90 @@
+<?php
+
+/**
+ * @file
+ * Email Tracker module.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_mail_alter().
+ */
+function email_tracker_mail_alter(array &$message) {
+
+  $database = \Drupal::database();
+
+  // Generate UUID.
+  $uuid = \Drupal::service('uuid')->generate();
+
+  // Get time.
+  $time = \Drupal::service('datetime.time')->getRequestTime();
+
+  // Get email details.
+  $to = $message['to'] ?? '';
+  $subject = $message['subject'] ?? '';
+
+  // Insert into DB.
+  $database->insert('email_tracker_mail')
+    ->fields([
+      'uuid' => $uuid,
+      'recipient' => $to,
+      'subject' => $subject,
+      'created' => $time,
+      'status' => 'sent',
+      'opens' => 0,
+      'clicks' => 0,
+    ])
+    ->execute();
+
+  // Ensure body exists.
+  if (empty($message['body']) || !is_array($message['body'])) {
+    return;
+  }
+  // ============================
+  // ✅ CLICK TRACKING (HTML + TEXT)
+  // ============================
+  foreach ($message['body'] as &$body_part) {
+
+    // 1. Replace HTML links
+    $body_part = preg_replace_callback('/href="([^"]+)"/', function ($matches) use ($uuid) {
+      $original_url = $matches[1];
+
+      $tracking_url = Url::fromRoute('email_tracker.click', [
+        'uuid' => $uuid,
+      ], [
+        'query' => ['url' => base64_encode($original_url)],
+        'absolute' => TRUE,
+      ])->toString();
+
+      return 'href="' . $tracking_url . '"';
+    }, $body_part);
+
+    // 2. Replace plain text URLs
+    $body_part = preg_replace_callback('/(https?:\/\/[^\s]+)/', function ($matches) use ($uuid) {
+      $original_url = $matches[1];
+
+      return Url::fromRoute('email_tracker.click', [
+        'uuid' => $uuid,
+      ], [
+        'query' => ['url' => base64_encode($original_url)],
+        'absolute' => TRUE,
+      ])->toString();
+    }, $body_part);
+  }
+
+  // ============================
+  // ✅ OPEN TRACKING (ONLY HTML)
+  // ============================
+  $is_html = isset($message['headers']['Content-Type']) &&
+    strpos($message['headers']['Content-Type'], 'text/html') !== FALSE;
+
+  if ($is_html) {
+    $pixel_url = Url::fromRoute('email_tracker.open', ['uuid' => $uuid], ['absolute' => TRUE])->toString();
+
+    $pixel = '<img src="' . $pixel_url . '" width="1" height="1" style="display:none;" />';
+
+    $message['body'][] = $pixel;
+  }
+
+}

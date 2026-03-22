@@ -3,5 +3,3 @@ type: module
 description: Tracks email opens and clicks.
 package: Mail
 core_version_requirement: ^9 || ^10 || ^11
-dependencies:
-  - drupal:views
