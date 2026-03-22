@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the Email Tracker module.
+ * Install, update and uninstall functions for Email Tracker.
  */
 
 /**
@@ -11,9 +11,7 @@
 function email_tracker_schema() {
   $schema = [];
 
-  /**
-   * Main email table.
-   */
+  // Main email table.
   $schema['email_tracker_mail'] = [
     'description' => 'Stores sent emails.',
     'fields' => [
@@ -69,9 +67,7 @@ function email_tracker_schema() {
     ],
   ];
 
-  /**
-   * Event tracking table.
-   */
+  // Event tracking table.
   $schema['email_tracker_event'] = [
     'description' => 'Stores email events like opens and clicks.',
     'fields' => [

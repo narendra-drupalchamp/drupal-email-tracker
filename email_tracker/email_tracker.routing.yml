@@ -1,0 +1,13 @@
+email_tracker.open:
+  path: '/email-tracker/open/{uuid}'
+  defaults:
+    _controller: '\Drupal\email_tracker\Controller\EmailTrackerController::open'
+  requirements:
+    _access: 'TRUE'
+
+email_tracker.click:
+  path: '/email-tracker/click/{uuid}'
+  defaults:
+    _controller: '\Drupal\email_tracker\Controller\EmailTrackerController::click'
+  requirements:
+    _access: 'TRUE'
